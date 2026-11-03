@@ -134,7 +134,14 @@ for i in $(seq 1 20); do
   sleep 6
 done
 
-CODE="$(curl -sS -o /dev/null -w '%{http_code}' -L "$URL" 2>/dev/null || echo 000)"
+# Report the first hop and, separately, where it lands. Using -L with
+# %{http_code} concatenates the code from every hop, which is unreadable.
+CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$URL" 2>/dev/null || echo 000)"
+REDIR="$(curl -sS -o /dev/null -w '%{redirect_url}' "$URL" 2>/dev/null || true)"
+FINAL=""
+if [[ -n "$REDIR" ]]; then
+  FINAL="$(curl -sSL -o /dev/null -w '%{response_code}' "$URL" 2>/dev/null || echo 000)"
+fi
 
 cat <<EOF
 
@@ -145,7 +152,24 @@ cat <<EOF
 ────────────────────────────────────────────────────────────
 EOF
 
-if [[ "$CODE" != "200" ]]; then
+# An account-level Pages custom domain (a CNAME file in <owner>.github.io)
+# redirects every project site on the account, including this one. If that
+# domain has no DNS, the deck is built but unreachable — flag it loudly,
+# because "status: built" otherwise looks like success.
+if [[ -n "$REDIR" ]]; then
+  echo "  ! $URL redirects to $REDIR (final HTTP ${FINAL})"
+  if [[ "$FINAL" != "200" ]]; then
+    HOST="${REDIR#https://}"; HOST="${HOST#http://}"; HOST="${HOST%%/*}"
+    cat <<EOF
+
+  That redirect comes from the custom domain on your user site
+  (a CNAME file in $OWNER/$OWNER.github.io), which GitHub applies to every
+  project Pages site on the account. '$HOST' is not resolving, so the deck is
+  built but unreachable. Either fix that domain's DNS, or remove the CNAME to
+  fall back to $OWNER.github.io URLs.
+EOF
+  fi
+elif [[ "$CODE" != "200" ]]; then
   cat <<EOF
 The first Pages build can take 1-3 minutes. If the URL 404s, wait a moment and
 reload, or check: https://github.com/$SLUG/settings/pages
