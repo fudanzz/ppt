@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}" data-theme="{{THEME}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>{{TITLE}}</title>
+    <meta name="description" content="{{DESCRIPTION}}" />
+    <meta property="og:title" content="{{TITLE}}" />
+    <meta property="og:description" content="{{DESCRIPTION}}" />
+    <meta property="og:type" content="website" />
+
+    <link rel="stylesheet" href="{{ASSETS}}/vendor/dist/reset.css" />
+    <link rel="stylesheet" href="{{ASSETS}}/vendor/dist/reveal.css" />
+    <link rel="stylesheet" href="{{ASSETS}}/deck.css" />
+    <style>
+      :root { --accent: {{ACCENT}}; }
+{{EXTRA_CSS}}
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+{{SLIDES}}
+      </div>
+    </div>
+
+    <a class="deck-home" href="{{HOME}}" title="All decks" aria-label="All decks">&#8962;</a>
+
+    <script src="{{ASSETS}}/vendor/dist/reveal.js"></script>
+    <script src="{{ASSETS}}/vendor/plugin/notes/notes.js"></script>
+    <script src="{{ASSETS}}/vendor/plugin/highlight/highlight.js"></script>
+    <script src="{{ASSETS}}/vendor/plugin/zoom/zoom.js"></script>
+    <script src="{{ASSETS}}/vendor/plugin/search/search.js"></script>
+    <script src="{{ASSETS}}/deck.js"></script>
+  </body>
+</html>

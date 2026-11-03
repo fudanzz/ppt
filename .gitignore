@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+*.swp
+.venv/
+
+# docs/ is deliberately NOT ignored — GitHub Pages serves it from the repo.

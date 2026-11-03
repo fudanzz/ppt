@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Decks</title>
+    <meta name="description" content="HTML presentation decks" />
+    <style>
+      :root {
+        --accent: #4f46e5;
+        --bg: #fbfbfc;
+        --surface: #ffffff;
+        --ink: #14161a;
+        --ink-2: #4a515b;
+        --ink-3: #868d99;
+        --line: #e4e7eb;
+        --radius: 14px;
+        --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e1014;
+          --surface: #171b21;
+          --ink: #f2f4f7;
+          --ink-2: #bfc6d0;
+          --ink-3: #828a97;
+          --line: #262b33;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+      }
+
+      .wrap { max-width: 840px; margin: 0 auto; padding: 72px 28px 96px; }
+
+      header { margin-bottom: 44px; }
+      .kicker {
+        font-size: 12px;
+        font-weight: 650;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 10px;
+      }
+      h1 {
+        font-size: 40px;
+        letter-spacing: -0.028em;
+        font-weight: 660;
+        margin: 0;
+        line-height: 1.1;
+      }
+      header p {
+        margin: 12px 0 0;
+        color: var(--ink-3);
+        font-size: 15px;
+      }
+
+      .list { display: flex; flex-direction: column; gap: 12px; }
+
+      .g-card {
+        display: flex;
+        align-items: stretch;
+        gap: 18px;
+        padding: 20px 22px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.16s ease, transform 0.16s ease,
+          box-shadow 0.16s ease;
+      }
+      .g-card:hover {
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px -14px rgba(16, 18, 22, 0.28);
+      }
+
+      .g-swatch {
+        flex: none;
+        width: 4px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+      .g-main { flex: 1 1 auto; min-width: 0; }
+
+      .g-card h2 {
+        font-size: 20px;
+        font-weight: 620;
+        letter-spacing: -0.015em;
+        margin: 0;
+        line-height: 1.25;
+      }
+      .g-sub {
+        margin: 5px 0 0;
+        color: var(--ink-2);
+        font-size: 14.5px;
+        line-height: 1.4;
+      }
+      .g-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 12.5px;
+        color: var(--ink-3);
+      }
+      .g-meta .sep { opacity: 0.5; }
+      .g-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+      .g-tags:empty { display: none; }
+      .tag {
+        font-size: 11.5px;
+        font-weight: 550;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 11%, transparent);
+        color: color-mix(in srgb, var(--accent) 75%, var(--ink));
+        border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+      }
+      .g-arrow {
+        flex: none;
+        align-self: center;
+        font-size: 19px;
+        color: var(--ink-3);
+        transition: transform 0.16s ease, color 0.16s ease;
+      }
+      .g-card:hover .g-arrow { transform: translateX(3px); color: var(--accent); }
+
+      .empty {
+        padding: 36px 24px;
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+        color: var(--ink-3);
+        text-align: center;
+        font-size: 14.5px;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        background: color-mix(in srgb, var(--ink) 7%, transparent);
+        padding: 1.5px 5px;
+        border-radius: 5px;
+      }
+
+      footer {
+        margin-top: 52px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        font-size: 12.5px;
+        color: var(--ink-3);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      kbd {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        padding: 1px 5px;
+        background: var(--surface);
+        color: var(--ink-2);
+      }
+
+      @media (max-width: 560px) {
+        .wrap { padding: 44px 18px 64px; }
+        h1 { font-size: 30px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <p class="kicker">Presentations</p>
+        <h1>Decks</h1>
+        <p>
+          1 deck(s) &middot; built 2026-11-03. Arrow keys to navigate,
+          <kbd>Esc</kbd> for overview, <kbd>S</kbd> for speaker notes,
+          <kbd>T</kbd> to toggle dark, <kbd>Shift</kbd>+<kbd>P</kbd> to export PDF.
+        </p>
+      </header>
+
+      <main class="list">
+        <a class="g-card" href="./platform-strategy-2027/" style="--accent: #4f46e5">
+          <span class="g-swatch"></span>
+          <span class="g-main">
+            <h2>Platform Strategy 2027</h2>
+            <p class="g-sub">Where we invest over the next four quarters</p>
+            <span class="g-meta"><span>2026-11-03</span><span class="sep">&middot;</span><span>Priya Raman</span><span class="sep">&middot;</span><span>15 slides</span></span>
+            <span class="g-tags"><span class="tag">strategy</span><span class="tag">internal</span></span>
+          </span>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+      </main>
+
+      <footer>
+        <span>Built with reveal.js</span>
+        <span>Press <kbd>F</kbd> inside a deck for fullscreen</span>
+      </footer>
+    </div>
+  </body>
+</html>

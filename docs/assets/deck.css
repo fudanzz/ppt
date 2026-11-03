@@ -1,0 +1,675 @@
+/* ==========================================================================
+   deck.css — design system for HTML decks built on reveal.js
+   Layered on top of dist/reveal.css. Replaces the stock reveal themes.
+
+   Deck size is 1280x720 (16:9). reveal.js scales that box to the viewport,
+   so all sizing below is in absolute px against a 1280x720 canvas.
+   ========================================================================== */
+
+/* --- Tokens --------------------------------------------------------------- */
+
+:root {
+  /* Accent — override per deck via deck.json "accent" */
+  --accent: #4f46e5;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 32%, transparent);
+  --accent-ink: color-mix(in srgb, var(--accent) 72%, #000 28%);
+
+  /* Neutrals (light) */
+  --bg: #ffffff;
+  --bg-sunk: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-2: #3d434d;
+  --ink-3: #6b7280;
+  --line: #e3e6ea;
+  --line-strong: #c9ced6;
+
+  /* Type scale */
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono",
+    Menlo, Consolas, monospace;
+  --font-serif: ui-serif, Georgia, "Times New Roman", serif;
+
+  --t-display: 68px;
+  --t-h1: 50px;
+  --t-h2: 38px;
+  --t-h3: 27px;
+  --t-body: 23px;
+  --t-small: 19px;
+  --t-micro: 15px;
+
+  /* Spacing scale */
+  --s1: 6px;
+  --s2: 12px;
+  --s3: 18px;
+  --s4: 26px;
+  --s5: 38px;
+  --s6: 56px;
+  --s7: 80px;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(16, 18, 22, 0.05),
+    0 8px 24px -10px rgba(16, 18, 22, 0.14);
+}
+
+/* Dark variant — set data-theme="dark" on <html> */
+html[data-theme="dark"] {
+  --bg: #0f1115;
+  --bg-sunk: #16191f;
+  --surface: #1a1e25;
+  --ink: #f2f4f7;
+  --ink-2: #c4cad3;
+  --ink-3: #8b93a0;
+  --line: #2a2f38;
+  --line-strong: #3b424d;
+  --accent-ink: color-mix(in srgb, var(--accent) 78%, #fff 22%);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* --- Reveal base overrides ------------------------------------------------ */
+
+.reveal-viewport {
+  background: var(--bg);
+}
+
+.reveal {
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  font-weight: 400;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+/* Every slide is a padded flex column. Layout classes redefine the inside. */
+.reveal .slides > section,
+.reveal .slides > section > section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 720px;
+  padding: var(--s6) var(--s7);
+  box-sizing: border-box;
+  line-height: 1.45;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  margin: 0;
+  text-transform: none;
+  letter-spacing: -0.021em;
+  line-height: 1.12;
+  font-weight: 640;
+  text-shadow: none;
+}
+
+.reveal h1 { font-size: var(--t-h1); }
+.reveal h2 { font-size: var(--t-h2); }
+.reveal h3 { font-size: var(--t-h3); font-weight: 600; }
+
+.reveal p { margin: 0; }
+.reveal a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid var(--accent-line); }
+.reveal strong, .reveal b { font-weight: 650; color: var(--ink); }
+.reveal em { font-style: italic; }
+
+.reveal section img {
+  border: none;
+  background: none;
+  box-shadow: none;
+  margin: 0;
+  max-width: 100%;
+}
+
+/* Progress + controls tinted to accent */
+.reveal .progress { color: var(--accent); height: 3px; }
+.reveal .controls { color: var(--accent); }
+.reveal .slide-number {
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  right: 18px;
+  bottom: 14px;
+}
+
+/* --- Shared building blocks ---------------------------------------------- */
+
+/* Eyebrow / kicker above a heading */
+.eyebrow {
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: var(--s2) !important;
+}
+
+.lede {
+  font-size: var(--t-h3);
+  color: var(--ink-2);
+  font-weight: 400;
+  line-height: 1.38;
+}
+
+.muted { color: var(--ink-3); }
+.small { font-size: var(--t-small); }
+.micro { font-size: var(--t-micro); }
+
+/* A short accent rule used under headings */
+.rule {
+  width: 56px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+  margin: var(--s3) 0 0;
+  flex: none;
+}
+
+/* Slide header block: eyebrow + h2 + optional subhead */
+.s-head { flex: none; margin-bottom: var(--s5); }
+.s-head h2 + p { margin-top: var(--s2); color: var(--ink-2); font-size: var(--t-body); }
+.s-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+
+/* Footnote pinned to the bottom of a slide */
+.footnote {
+  flex: none;
+  margin-top: var(--s4);
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+  border-top: 1px solid var(--line);
+  padding-top: var(--s2);
+}
+
+/* --- Lists ---------------------------------------------------------------- */
+
+.reveal ul,
+.reveal ol {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reveal ul > li,
+.reveal ol > li {
+  position: relative;
+  padding-left: var(--s4);
+  margin: 0 0 var(--s3);
+  line-height: 1.42;
+}
+
+.reveal ul > li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.reveal ol { counter-reset: li; }
+.reveal ol > li { padding-left: var(--s5); }
+.reveal ol > li::before {
+  counter-increment: li;
+  content: counter(li);
+  position: absolute;
+  left: 0;
+  top: 0.08em;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: var(--t-micro);
+  font-weight: 650;
+  display: grid;
+  place-items: center;
+}
+
+/* Nested list */
+.reveal li ul { margin-top: var(--s2); }
+.reveal li ul > li {
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  margin-bottom: var(--s1);
+}
+.reveal li ul > li::before {
+  background: none;
+  border: 1.5px solid var(--line-strong);
+  top: 0.5em;
+}
+
+/* A list where each item has a bold lead-in and description */
+ul.defs > li { margin-bottom: var(--s4); }
+ul.defs > li .d-term { font-weight: 650; display: block; }
+ul.defs > li .d-desc { color: var(--ink-2); font-size: var(--t-small); display: block; margin-top: 2px; }
+
+/* --- Layout: title ------------------------------------------------------- */
+
+section.l-title { justify-content: center; }
+section.l-title h1 { font-size: var(--t-display); letter-spacing: -0.028em; }
+section.l-title .lede { margin-top: var(--s3); max-width: 24ch; }
+section.l-title .meta {
+  margin-top: var(--s6);
+  display: flex;
+  gap: var(--s4);
+  align-items: center;
+  font-size: var(--t-small);
+  color: var(--ink-3);
+  flex-wrap: wrap;
+}
+section.l-title .meta > * { display: flex; align-items: center; gap: var(--s2); }
+section.l-title .meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--line-strong); }
+
+/* Accent wash behind the title slide */
+section.l-title::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 90% at 100% 0%,
+    var(--accent-soft) 0%,
+    transparent 58%
+  );
+  pointer-events: none;
+}
+
+/* --- Layout: section divider --------------------------------------------- */
+
+section.l-section {
+  justify-content: center;
+  background: var(--bg-sunk);
+}
+section.l-section .s-num {
+  font-size: var(--t-micro);
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  margin-bottom: var(--s3);
+}
+section.l-section h2 { font-size: var(--t-h1); max-width: 26ch; }
+section.l-section .lede { margin-top: var(--s3); max-width: 46ch; }
+
+/* --- Layout: two columns ------------------------------------------------- */
+
+section.l-two .cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s6);
+  align-items: start;
+}
+section.l-two .cols.narrow-left { grid-template-columns: 2fr 3fr; }
+section.l-two .cols.narrow-right { grid-template-columns: 3fr 2fr; }
+.col h3 { margin-bottom: var(--s3); }
+.col > p { color: var(--ink-2); }
+
+/* --- Layout: cards ------------------------------------------------------- */
+
+.cards {
+  display: grid;
+  gap: var(--s3);
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+  align-items: stretch;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s4);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.card .c-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  margin-bottom: var(--s1);
+  flex: none;
+}
+.card h3 { font-size: 22px; }
+.card p { font-size: var(--t-small); color: var(--ink-2); line-height: 1.4; }
+.card.accent { border-color: var(--accent-line); background: var(--accent-soft); box-shadow: none; }
+
+/* --- Layout: metrics / KPI ----------------------------------------------- */
+
+.metrics {
+  display: grid;
+  gap: var(--s3);
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+}
+.metric {
+  padding: var(--s4);
+  border-radius: var(--radius);
+  background: var(--bg-sunk);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+.metric .m-val {
+  font-size: 54px;
+  font-weight: 680;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.metric .m-val .m-unit { font-size: 26px; font-weight: 600; color: var(--ink-3); margin-left: 2px; }
+.metric .m-label { font-size: var(--t-small); color: var(--ink-2); font-weight: 550; }
+.metric .m-sub { font-size: var(--t-micro); color: var(--ink-3); }
+.metric.up .m-val { color: var(--accent-ink); }
+
+/* --- Layout: big number -------------------------------------------------- */
+
+section.l-big { justify-content: center; align-items: flex-start; }
+section.l-big .b-val {
+  font-size: 170px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+}
+section.l-big .b-label { font-size: var(--t-h3); color: var(--ink-2); margin-top: var(--s3); max-width: 34ch; }
+
+/* --- Layout: quote ------------------------------------------------------- */
+
+section.l-quote { justify-content: center; }
+section.l-quote blockquote {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font-size: 40px;
+  font-weight: 450;
+  line-height: 1.28;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+  max-width: 30ch;
+  font-style: normal;
+  width: auto;
+}
+section.l-quote blockquote::before {
+  content: "\201C";
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 96px;
+  line-height: 0.6;
+  color: var(--accent-line);
+  margin-bottom: var(--s2);
+}
+section.l-quote .attrib {
+  margin-top: var(--s5);
+  font-size: var(--t-small);
+  color: var(--ink-3);
+}
+section.l-quote .attrib .a-name { color: var(--ink); font-weight: 600; display: block; }
+
+/* --- Layout: steps / timeline -------------------------------------------- */
+
+.steps { display: flex; gap: 0; align-items: stretch; }
+.steps .step {
+  flex: 1;
+  padding: 0 var(--s3);
+  border-left: 2px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.steps .step:first-child { padding-left: 0; border-left: none; }
+.steps .step .st-n {
+  font-size: var(--t-micro);
+  font-weight: 650;
+  color: var(--accent-ink);
+  letter-spacing: 0.08em;
+}
+.steps .step h3 { font-size: 21px; }
+.steps .step p { font-size: var(--t-micro); color: var(--ink-2); line-height: 1.42; }
+.steps .step.done { border-left-color: var(--accent); }
+
+/* Vertical timeline */
+.timeline { display: flex; flex-direction: column; }
+.timeline .tl-row {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: var(--s4);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.timeline .tl-row:last-child { border-bottom: none; }
+.timeline .tl-when { font-size: var(--t-small); font-weight: 650; color: var(--accent-ink); }
+.timeline .tl-what h3 { font-size: 21px; }
+.timeline .tl-what p { font-size: var(--t-micro); color: var(--ink-2); margin-top: 3px; }
+
+/* --- Layout: compare ----------------------------------------------------- */
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+.compare .cmp {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s4);
+  background: var(--surface);
+}
+.compare .cmp h3 { font-size: 22px; display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s3); }
+.compare .cmp.pro { border-color: var(--accent-line); background: var(--accent-soft); }
+.compare .cmp li { font-size: var(--t-small); margin-bottom: var(--s2); color: var(--ink-2); }
+.compare .cmp li::before { background: var(--line-strong); }
+.compare .cmp.pro li::before { background: var(--accent); }
+
+/* --- Tables -------------------------------------------------------------- */
+
+.reveal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-small);
+  margin: 0;
+}
+.reveal table th {
+  text-align: left;
+  font-weight: 620;
+  font-size: var(--t-micro);
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 2px solid var(--line-strong);
+  padding: 0 var(--s3) var(--s2) 0;
+}
+.reveal table td {
+  padding: var(--s2) var(--s3) var(--s2) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  vertical-align: top;
+}
+.reveal table td:first-child { color: var(--ink); font-weight: 550; }
+.reveal table .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.reveal table tr.total td { font-weight: 650; color: var(--ink); border-bottom: none; border-top: 2px solid var(--line-strong); }
+
+/* --- Code ---------------------------------------------------------------- */
+
+.reveal pre {
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+  font-size: 17px;
+  background: var(--bg-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--s3);
+  box-sizing: border-box;
+}
+.reveal pre code {
+  font-family: var(--font-mono);
+  padding: 0;
+  background: none;
+  max-height: none;
+  line-height: 1.55;
+  overflow: visible;
+}
+.reveal code:not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-sunk);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: var(--accent-ink);
+}
+
+/* --- Images -------------------------------------------------------------- */
+
+.figure { display: flex; flex-direction: column; gap: var(--s2); min-height: 0; }
+.figure img {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  object-fit: cover;
+  min-height: 0;
+  max-height: 100%;
+}
+.figure figcaption { font-size: var(--t-micro); color: var(--ink-3); }
+
+section.l-full { padding: 0; justify-content: flex-end; position: relative; }
+section.l-full .bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+section.l-full .overlay {
+  position: relative;
+  padding: var(--s6) var(--s7);
+  width: 100%;
+  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(8, 10, 14, 0.88) 0%, rgba(8, 10, 14, 0) 100%);
+}
+section.l-full .overlay h2, section.l-full .overlay p { color: #fff; }
+section.l-full .overlay p { color: rgba(255, 255, 255, 0.78); margin-top: var(--s2); }
+
+/* --- Charts (see the dataviz skill for the chart itself) ------------------ */
+
+.chart-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.chart-wrap svg, .chart-wrap canvas { max-width: 100%; max-height: 100%; min-height: 0; }
+.legend { display: flex; gap: var(--s4); flex-wrap: wrap; font-size: var(--t-micro); color: var(--ink-2); flex: none; }
+.legend .lg { display: flex; align-items: center; gap: var(--s1); }
+.legend .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+/* --- Layout: closing ----------------------------------------------------- */
+
+section.l-end { justify-content: center; background: var(--bg-sunk); }
+section.l-end h2 { font-size: var(--t-h1); }
+section.l-end .contact { margin-top: var(--s5); display: flex; flex-direction: column; gap: var(--s2); font-size: var(--t-body); color: var(--ink-2); }
+
+/* --- Utilities ----------------------------------------------------------- */
+
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.gap1 { gap: var(--s1); } .gap2 { gap: var(--s2); } .gap3 { gap: var(--s3); }
+.gap4 { gap: var(--s4); } .gap5 { gap: var(--s5); } .gap6 { gap: var(--s6); }
+.grow { flex: 1 1 auto; min-height: 0; }
+.center { text-align: center; align-items: center; }
+.tight { line-height: 1.25; }
+.cols-1 { --cols: 1; } .cols-2 { --cols: 2; } .cols-3 { --cols: 3; }
+.cols-4 { --cols: 4; } .cols-5 { --cols: 5; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent-line);
+}
+.pill.plain { background: var(--bg-sunk); color: var(--ink-3); border-color: var(--line); }
+
+/* Dense slides: opt in to tighter type when a slide must carry more content */
+section.dense { --t-body: 20px; --t-small: 17px; --t-h2: 33px; --t-h3: 23px; }
+section.dense .s-head { margin-bottom: var(--s4); }
+
+/* --- Syntax highlighting -------------------------------------------------
+   Replaces the stock highlight.js themes so code follows the deck tokens
+   and stays readable in both light and dark.
+   ------------------------------------------------------------------------- */
+
+.reveal .hljs { background: transparent; color: var(--ink-2); }
+.hljs-comment, .hljs-quote { color: var(--ink-3); font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-type {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.hljs-string, .hljs-regexp, .hljs-addition { color: #0a7d55; }
+.hljs-number, .hljs-variable, .hljs-template-variable { color: #b2561c; }
+.hljs-title, .hljs-section, .hljs-name, .hljs-attr { color: var(--ink); font-weight: 600; }
+.hljs-built_in, .hljs-builtin-name, .hljs-symbol { color: #8a4bbd; }
+.hljs-attribute, .hljs-meta { color: var(--ink-3); }
+.hljs-deletion { color: #c03030; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
+
+html[data-theme="dark"] .hljs-string,
+html[data-theme="dark"] .hljs-addition { color: #5fcf9a; }
+html[data-theme="dark"] .hljs-number,
+html[data-theme="dark"] .hljs-variable { color: #e5a05e; }
+html[data-theme="dark"] .hljs-built_in,
+html[data-theme="dark"] .hljs-symbol { color: #c99aec; }
+html[data-theme="dark"] .hljs-deletion { color: #f08585; }
+
+/* Highlighted line ranges (data-line-numbers="3-5") */
+.reveal .hljs .highlight-line { background: var(--accent-soft); }
+
+/* --- Deck chrome: link back to the gallery -------------------------------- */
+
+.deck-home {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 40;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid transparent;
+  text-decoration: none;
+  opacity: 0.35;
+  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.deck-home:hover {
+  opacity: 1;
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--accent-ink);
+}
+@media print { .deck-home { display: none; } }
+
+/* --- Print / PDF export -------------------------------------------------- */
+
+@media print {
+  .reveal .slides > section { height: 720px; }
+  section.l-section, section.l-end { background: var(--bg-sunk) !important; }
+  .card, .metric, .compare .cmp { box-shadow: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
