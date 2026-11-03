@@ -1,0 +1,10 @@
+{
+  "title": "Isolation Primitives for AI Agents",
+  "subtitle": "Containers, traditional VMs, and microVMs for running untrusted code",
+  "description": "Team knowledge share comparing namespaces/cgroups, KVM virtual machines, and Rust-based microVMs as isolation boundaries for autonomous AI agents.",
+  "date": "2026-11-03",
+  "accent": "#0f766e",
+  "theme": "light",
+  "lang": "en",
+  "tags": ["infrastructure", "security", "knowledge share"]
+}

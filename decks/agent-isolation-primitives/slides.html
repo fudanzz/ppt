@@ -1,0 +1,204 @@
+<!-- Isolation Primitives for AI Agents — team knowledge share -->
+
+<section class="l-title">
+  <p class="eyebrow">Team knowledge share</p>
+  <h1>Isolation Primitives for AI Agents</h1>
+  <p class="lede">Containers, VMs, and microVMs for running untrusted code.</p>
+  <div class="meta">
+    <span>3 November 2026</span>
+    <span class="dot"></span>
+    <span>Internal</span>
+  </div>
+</section>
+
+<section class="l-two">
+  <div class="s-head">
+    <p class="eyebrow">Containers &middot; namespaces &amp; cgroups</p>
+    <h2>Isolation that stops at the host kernel</h2>
+  </div>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <h3>How it isolates</h3>
+        <ul>
+          <li>Linux namespaces (mount, PID, net) for view isolation; cgroups for resource allocation</li>
+          <li>Untrusted AI code runs as native host processes, sharing the host kernel</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>Where it breaks down</h3>
+        <ul class="defs">
+          <li>
+            <span class="d-term">Kernel exposure</span>
+            <span class="d-desc">Any kernel vulnerability lets malicious or buggy LLM-generated code gain root on the host.</span>
+          </li>
+          <li>
+            <span class="d-term">Agent limitations</span>
+            <span class="d-desc">Strict <code>seccomp</code> syscall filters break the CLI tools agents rely on &mdash; <code>ps</code>, <code>lsof</code>, network debugging.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="footnote">
+    <span class="pill plain">Best used for</span>
+    Trusted internal microservices, or deterministic read-only tools.
+  </p>
+  <aside class="notes">
+    The tension here is the whole problem. You can harden a container with
+    seccomp until it is genuinely difficult to escape &mdash; but the filters
+    that make it safe are the same ones that break the debugging tools a coding
+    agent needs to do its job. So you end up choosing between an agent that
+    works and a container that is safe. Note that the shared kernel means one
+    vulnerability is a host compromise, not a container compromise.
+  </aside>
+</section>
+
+<section class="l-two">
+  <div class="s-head">
+    <p class="eyebrow">Traditional VMs &middot; KVM / QEMU</p>
+    <h2>Hardware-grade isolation, at a cost</h2>
+  </div>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <h3>How it isolates</h3>
+        <ul>
+          <li>Full hardware virtualization via KVM; each VM gets its own guest kernel and user space</li>
+          <li>Enforced at the CPU boundary &mdash; <code>VMX non-root</code> guest versus <code>VMX root</code> host</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>The trade-off</h3>
+        <ul class="defs">
+          <li>
+            <span class="d-term">Strong isolation</span>
+            <span class="d-desc">Host infrastructure stays secure even if the guest kernel is fully compromised.</span>
+          </li>
+          <li>
+            <span class="d-term">Heavy overhead</span>
+            <span class="d-desc">Legacy C-based QEMU device emulation means ~40 second cold boots and high idle RAM.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="footnote">
+    <span class="pill plain">Best used for</span>
+    Legacy multi-tenant cloud workloads where cold-start latency is not time-sensitive.
+  </p>
+  <aside class="notes">
+    The security story here is genuinely good &mdash; this is the boundary the
+    public cloud was built on, and a compromised guest kernel does not get you
+    the host. The problem is purely operational. Forty seconds is fine when you
+    boot a VM once and run it for a month. It is unusable when an agent wants a
+    fresh sandbox for every task, which is exactly our access pattern.
+  </aside>
+</section>
+
+<section class="l-two">
+  <div class="s-head">
+    <p class="eyebrow">MicroVMs &middot; Firecracker / Cloud Hypervisor</p>
+    <h2>Container speed with hardware isolation</h2>
+  </div>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <h3>How it isolates</h3>
+        <ul>
+          <li>Minimalist virtual machine monitors written in memory-safe <strong>Rust</strong></li>
+          <li>Hardware-assisted KVM plus jailed, minimal emulated devices that separate block and net syscall capabilities</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>Why it fits agents</h3>
+        <ul class="defs">
+          <li>
+            <span class="d-term">Fast and isolated</span>
+            <span class="d-desc">Sub-second to &lt;7 second boots with full hardware isolation &mdash; not one or the other.</span>
+          </li>
+          <li>
+            <span class="d-term">State backtracking</span>
+            <span class="d-desc">Lightweight guest RAM and read-write disk overlay snapshots let agents checkpoint, recover, and replan.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="footnote">
+    <span class="pill">Best used for</span>
+    Modern multi-tenant AI agent clouds and untrusted code execution.
+  </p>
+  <aside class="notes">
+    Two things matter here. First, the Rust VMM adds memory safety on top of the
+    KVM boundary, so the hypervisor itself is a much smaller attack surface than
+    QEMU. Second &mdash; and this is the part people miss &mdash; snapshotting
+    is not just a performance feature. An agent that can checkpoint before a
+    risky step and roll back after a failure can replan instead of starting
+    over. That changes what the agent can safely attempt.
+  </aside>
+</section>
+
+<section class="dense">
+  <div class="s-head">
+    <p class="eyebrow">Executive summary</p>
+    <h2>MicroVMs remove the security-versus-speed trade-off</h2>
+  </div>
+  <div class="s-body">
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Containers</th>
+          <th>Traditional VMs</th>
+          <th>MicroVMs</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Isolation primitive</td>
+          <td>OS namespaces &amp; cgroups</td>
+          <td>KVM hardware virtualization</td>
+          <td><strong>Rust VMM + KVM</strong></td>
+        </tr>
+        <tr>
+          <td>Security boundary</td>
+          <td>Shared host kernel &mdash; high risk</td>
+          <td>Hardware isolation (KVM)</td>
+          <td><strong>Hardware + Rust memory safety</strong></td>
+        </tr>
+        <tr>
+          <td>Boot latency</td>
+          <td>Milliseconds</td>
+          <td>~40 seconds</td>
+          <td><strong>Sub-second to &lt;7 seconds</strong></td>
+        </tr>
+        <tr>
+          <td>State snapshotting</td>
+          <td>File / container dumps only</td>
+          <td>Heavy, slow disk and RAM export</td>
+          <td><strong>Instant RAM + disk overlay restore</strong></td>
+        </tr>
+        <tr>
+          <td>Fit for AI agents</td>
+          <td>Poor &mdash; breaks tools or risks host</td>
+          <td>Poor &mdash; too slow for agent UX</td>
+          <td><strong>Optimal</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote">
+    <span class="pill">Key takeaway</span>
+    MicroVMs eliminate the trade-off between security and responsiveness, making
+    them the ideal isolation primitive for autonomous AI agents.
+  </p>
+  <aside class="notes">
+    Read the table down the MicroVM column rather than across. Containers win on
+    boot latency alone; VMs win on security alone; microVMs are the only column
+    without a disqualifying weakness for our use case. The snapshotting row is
+    the one that is easy to skip over and the one that most changes agent design.
+    If there is one decision to take away: new untrusted agent workloads should
+    default to microVMs, not hardened containers.
+  </aside>
+</section>
